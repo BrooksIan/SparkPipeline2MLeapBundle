@@ -13,3 +13,4 @@
 
 ![MLeap](http://mleap-docs.combust.ml/assets/images/logo.png "MLeap")
 
+**Instructions**: Upload the Zeppelin Noteboke (JSON) to your Zeppelin Server
