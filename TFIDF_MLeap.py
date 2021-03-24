@@ -38,12 +38,21 @@ regexTokenizer = RegexTokenizer(inputCol="abstract", outputCol="words", pattern=
 # alternatively, pattern="\\w+", gaps(False)
 regexTokenized = regexTokenizer.transform(df_WholeSetRaw)
 
+#Count Tokens for Common Words
+tokenizer = Tokenizer(inputCol="abstract", outputCol="words")
+tokenized = tokenizer.transform(df_WholeSetRaw)
+
+countTokens = udf(lambda words: len(words), IntegerType())  
+
 regexTokenized.select("abstract", "words") \
     .withColumn("tokens", countTokens(col("words"))).show(truncate=False)
-  
+
 #Pipeline Stage 1 - Hashing   
 hashingTF = HashingTF(inputCol="words", outputCol="rawFeatures", numFeatures=256)
 TFfeaturizedData = hashingTF.transform(regexTokenized)
+
+#Configure CountVectorizer Model  
+cvModel = CountVectorizer(inputCol="words", outputCol="rawFeatures", minDF=4,  vocabSize=100000).fit(tokenized)
 
 #Pipeline Stage 2 - TF/IDF Model 
 idf = IDF(inputCol="rawFeatures", outputCol="features")
