@@ -1,18 +1,17 @@
 from mleap import pyspark
+from mleap.pyspark.spark_support import SimpleSparkSerializer
+
 from pyspark.sql import SparkSession
 from pyspark.sql import types
 from pyspark.sql import DataFrame
 from pyspark.ml import Pipeline, PipelineModel
 
-from mleap.pyspark.spark_support import SimpleSparkSerializer
 
 spark  = SparkSession.builder \
-    .appName("SBIR") \
-    .enableHiveSupport() \
-    .config("spark.hadoop.yarn.resourcemanager.principal", "ibrooks") \
-    .config("spark.sql.warehouse.dir", "target/spark-warehouse") \
+    .appName("NLP_MLeap") \
+    .config('spark.jars.packages',"ml.combust.mleap:mleap-spark_2.11:0.16.0") \
     .getOrCreate()
-    
+
 spark.version
 
 df_WholeSetRaw = spark.read.option("multiline", "true").json("sbir-search-results*.json")
@@ -135,4 +134,4 @@ featurePipeline_KMeans = Pipeline(stages=feature_KMeans_pipeline)
 fittedPipeline_KMeans = featurePipeline_KMeans.fit(df_WholeSetRaw)
 
 # Serialize your pipeline
-fittedPipeline_KMeans.serializeToBundle("jar:file:/tmp/pyspark_KMeans_Pipeline.zip", fittedPipeline_KMeans.transform(df_WholeSetRaw))
+fittedPipeline_KMeans.serializeToBundle("jar:file:/home/cdsw/pyspark_KMeans_Pipeline.zip", fittedPipeline_KMeans.transform(df_WholeSetRaw))
